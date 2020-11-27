@@ -245,11 +245,13 @@ export default class BigBoard {
 		this.coneBoard.clean();
 	}
 
-	public cleanAll(list: IListFile[]): void {
+	public cleanAll(list?: IListFile[]): void {
 		this.cleanCones();
 		this.cleanCountries();
 		this._merger.clear();
-		this._gui.filesToInsert(list);
+		if (list != undefined) {
+			this._gui.filesToInsert(list);
+		}
 	}
 
 	/**

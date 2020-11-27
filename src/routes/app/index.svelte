@@ -21,11 +21,16 @@
 	async function addSet(event: MouseEvent) {
 		const name = (event.target as HTMLElement).dataset.name;
 		if (name !== undefined) {
+			bigBoard.cleanAll();
+			addLoader('block');
 			const zip = await fetch('datasets/' + name).then(async (raw) =>
 				raw.arrayBuffer().then((buf) => new Uint8Array(buf))
 			);
 			const unzipped: IListFile[] = JSON.parse(new TextDecoder('utf-8').decode(inflate(zip)));
 			bigBoard.cleanAll(unzipped);
+			if(bigBoard.state =='complete'){
+				addLoader('none');
+			}
 		}
 	}
 	onMount(async () => {
@@ -33,6 +38,10 @@
 		bigBoard = new BigBoard(board, dat);
 		window.bigBoard = bigBoard;
 	});
+	function addLoader(state : any): void {
+		const loader = document.getElementsByClassName('loader') as HTMLElement;
+		loader[0].style.display = state;
+	}
 </script>
 
 <style>
@@ -66,6 +75,23 @@
 		position: absolute;
 		right: 0px;
 	}
+	.loader {
+		display : none;
+		width : 100px;
+		height : 100px;
+		border : 6px solid #e5e5e5;
+		border-top : 6px solid #007bff; 
+		border-radius : 50%;
+		position : absolute;
+		top : 50%;
+		left : 50%;
+		transform : translate(-50%, -50%) rotate(0deg);
+		box-shadow : 0 0 2px 1px rgba(0,0,0,0.2);
+		animation : move 1s linear infinite;
+	}
+	@keyframes move {
+		100% {transform: translate(-50%, -50%)  rotate(360deg);}
+	}
 </style>
 
 <Menu fixed={false}>
@@ -76,4 +102,5 @@
 		{/each}
 	</div>
 	<div class="dat" bind:this={dat} />
+	<div class="loader" />
 </Menu>
